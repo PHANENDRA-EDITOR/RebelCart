@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Thank You - RebelCart</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container" id="invoice">
+    <h1>🧾 Invoice</h1>
+    <p>Thank you for your purchase!</p>
+    <p><strong>Order ID:</strong> #RC123456</p>
+    <p><strong>Date:</strong> <span id="date"></span></p>
+
+    <hr />
+
+    <h3>Items</h3>
+    <ul id="invoice-items"></ul>
+
+    <p><strong>Total: ₹<span id="total"></span></strong></p>
+
+    <button onclick="downloadInvoice()">Download PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const itemsList = document.getElementById("invoice-items");
+    let total = 0;
+
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      itemsList.innerHTML += `<li>${item.name} (x${item.quantity}) - ₹${item.price}</li>`;
+    });
+
+    document.getElementById("total").innerText = total;
+    document.getElementById("date").innerText = new Date().toLocaleDateString();
+
+    async function downloadInvoice() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.text("RebelCart Invoice", 10, 10);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 20);
+
+      cart.forEach((item, i) => {
+        doc.text(`${i + 1}. ${item.name} (x${item.quantity}) - ₹${item.price}`, 10, 30 + i * 10);
+      });
+
+      doc.text(`Total: ₹${total}`, 10, 30 + cart.length * 10 + 10);
+      doc.save("RebelCart_Invoice.pdf");
+    }
+  </script>
+</body>
+</html>

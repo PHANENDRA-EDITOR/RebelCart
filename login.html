@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - RebelCart</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f2f2f2;
+    }
+    .login-container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #ff3f6c;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #ff3f6c;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .error-msg {
+      color: red;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login to RebelCart</h2>
+    <div id="error-msg" class="error-msg"></div>
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required>
+      </div>
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+
+      const storedUser = JSON.parse(localStorage.getItem("rebelcartUser"));
+
+      if (storedUser && email === storedUser.email && password === storedUser.password) {
+        alert("Login successful! Redirecting to homepage...");
+        window.location.href = "index.html";
+      } else {
+        document.getElementById("error-msg").textContent = "Incorrect email or password.";
+      }
+    });
+  </script>
+</body>
+</html>

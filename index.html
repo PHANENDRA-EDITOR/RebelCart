@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RebelCart</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div class="header-main">
+    <div class="logo">RebelCart Logo <span class="highlight">RebelCart</span></div>
+    <input class="search-bar" id="searchInput" type="text" placeholder="Search products...">
+    
+    <div class="nav-item profile">
+      <div id="profileToggle" class="profile-icon">👤</div>
+      <div class="dropdown" id="profileDropdown"></div>
+    </div>
+
+    <label class="switch">
+      <input type="checkbox" id="theme-toggle">
+      <span class="slider round"></span>
+    </label>
+  </div>
+</header>
+
+<div class="welcome" id="welcome-msg">Welcome!</div>
+
+<section class="banner">
+  <h2><strong>FLAT ₹500 OFF</strong></h2>
+  <p>On Your 1st Purchase Via RebelCart App — Use Code: REBEL500</p>
+  <p>🎉 End of Reason Sale | 50-90% OFF</p>
+</section>
+<div class="filter-bar">
+  <label for="sizeFilter">Filter by Size: </label>
+  <select id="sizeFilter">
+    <option value="all">All</option>
+    <option value="S">S</option>
+    <option value="M">M</option>
+    <option value="L">L</option>
+  </select>
+</div>
+<h2 class="glow-text">Our Products</h2>
+<div class="product-grid" id="productGrid"></div>
+
+<script>
+  const products = [
+    { name: "Smart Watch", price: 2999, discount: 10, size: "M" },
+    { name: "Wireless Earbuds", price: 1999, discount: 20, size: "S" },
+    { name: "Bluetooth Speaker", price: 999, discount: 15, size: "L" },
+    { name: "Gaming Mouse", price: 1499, discount: 5, size: "M" },
+    { name: "Fitness Tracker", price: 3499, discount: 25, size: "S" },
+    { name: "Hoodie", price: 799, discount: 30, size: "L" }
+  ];
+
+  const searchInput = document.getElementById('searchInput');
+  const sizeFilter = document.getElementById('sizeFilter');
+
+  function renderProducts() {
+    const searchValue = searchInput.value.toLowerCase();
+    const sizeValue = sizeFilter.value;
+
+    const filteredProducts = products.filter(p => {
+      const matchesSize = sizeValue === "all" || p.size === sizeValue;
+      const matchesSearch = p.name.toLowerCase().includes(searchValue);
+      return matchesSize && matchesSearch;
+    });
+
+    const container = document.getElementById("productGrid");
+    container.innerHTML = '';
+
+    if (filteredProducts.length === 0) {
+      container.innerHTML = '<p class="no-products">No products found.</p>';
+      return;
+    }
+
+    filteredProducts.forEach(product => {
+      container.innerHTML += `
+        <div class="product-card">
+          <img src="https://via.placeholder.com/150?text=${product.name.replace(/ /g, '+')}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p class="price">₹${product.price} <span class="discount">(${product.discount}% OFF)</span></p>
+          <p>Size: ${product.size}</p>
+          <button class="btn add-to-cart" data-name="${product.name}" data-price="${product.price}" data-size="${product.size}">Add to Cart</button>
+        </div>
+      `;
+    });
+
+    attachAddToCartEvents();
+  }
+
+  function attachAddToCartEvents() {
+    const addToCartButtons = document.querySelectorAll(".add-to-cart");
+
+    addToCartButtons.forEach(button => {
+      button.addEventListener("click", function () {
+        const name = this.dataset.name;
+        const price = parseInt(this.dataset.price);
+        const size = this.dataset.size || "Default";
+
+        const cartItem = {
+          name: name,
+          price: price,
+          size: size,
+          quantity: 1
+        };
+
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        const existingIndex = cart.findIndex(item => item.name === name && item.size === size);
+        if (existingIndex > -1) {
+          cart[existingIndex].quantity += 1;
+        } else {
+          cart.push(cartItem);
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert(`${name} added to cart!`);
+      });
+    });
+  }
+
+  searchInput.addEventListener('input', renderProducts);
+  sizeFilter.addEventListener('change', renderProducts);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('rebelcartUser'));
+    const dropdown = document.getElementById('profileDropdown');
+
+    if (user && user.name) {
+      document.getElementById('welcome-msg').textContent = `Welcome, ${user.name}!`;
+      dropdown.innerHTML = `
+        <a href="wishlist.html">❤️ Wishlist</a>
+        <a href="orders.html">📦 Orders</a>
+        <a href="cart.html">🛒 Cart</a>
+        <a href="payments.html">💳 Payments</a>
+        <a href="#" onclick="signOut()">🚪 Sign Out</a>
+      `;
+    } else {
+      document.getElementById('welcome-msg').textContent = `Welcome to RebelCart!`;
+      dropdown.innerHTML = `
+        <a href="register.html">📝 Register</a>
+        <a href="login.html">🔐 Login</a>
+      `;
+    }
+
+    const profileToggle = document.getElementById('profileToggle');
+    profileToggle.addEventListener('click', function (event) {
+      event.stopPropagation();
+      dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!profileToggle.contains(event.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    renderProducts();
+  });
+
+  function signOut() {
+    localStorage.removeItem('rebelcartUser');
+    alert('Signed out successfully.');
+    window.location.href = 'login.html';
+  }
+</script>
+
+<script>
+  const toggle = document.getElementById('theme-toggle');
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+    toggle.checked = true;
+  }
+
+  toggle.addEventListener('change', function () {
+    if (this.checked) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('darkMode', 'false');
+    }
+  });
+</script>
+
+<footer class="footer">
+  <h3 class="glow-text" style="text-align: center;">© 2025 RebelCart. All rights reserved.</h3>
+  <p style="text-align: center;">
+    <a href="privacy.html">Privacy Policy</a> |
+    <a href="terms.html">Terms & Conditions</a>
+  </p>
+</footer>
+
+</body>
+</html>

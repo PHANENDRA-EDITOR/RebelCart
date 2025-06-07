@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RebelCart</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #333;
+    }
+
+    /* Red border for invalid input */
+    .input-error {
+      border: 2px solid red !important;
+    }
+
+    /* Style form for better UI */
+    .register-container {
+      max-width: 400px;
+      margin: 3rem auto;
+      padding: 2rem;
+      border-radius: 10px;
+      background: #f8f8f8;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    }
+    .register-container input,
+    .register-container select,
+    .register-container button {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .register-container button {
+      background: #ff3f6c;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .register-container button:hover {
+      background: #e0355b;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2>Register to RebelCart</h2>
+    <form id="register-form">
+      <input type="text" id="name" name="name" placeholder="Full Name" required />
+      <input type="email" id="email" name="email" placeholder="Email" required />
+      <input type="password" id="password" name="password" placeholder="Password" required />
+      <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Password" required />
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("register-form");
+      if (!form) return;
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById("name");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirm-password");
+
+        [name, email, password, confirmPassword].forEach(input => input.classList.remove("input-error"));
+
+        let hasError = false;
+
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (!passwordRegex.test(password.value)) {
+          alert("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+          password.classList.add("input-error");
+          hasError = true;
+        }
+
+        if (password.value !== confirmPassword.value) {
+          alert("Passwords do not match!");
+          confirmPassword.classList.add("input-error");
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        const userData = {
+          name: name.value,
+          email: email.value,
+          password: password.value
+        };
+
+        localStorage.setItem("rebelcartUser", JSON.stringify(userData));
+
+        alert("Registration successful! Redirecting to login...");
+        window.location.href = "login.html";
+      });
+    });
+  </script>
+</body>
+</html>
